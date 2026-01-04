@@ -1,3 +1,3 @@
 # Aang Air Control System
 ## Live Demo
-[![Aang Air Control System](https://github.com/user-attachments/assets/ec7563f2-79b9-4cf5-b2d7-78ad3f4368ec)](https://aang-air-control-system.web.app)
+[![Aang Air Control System](https://github.com/user-attachments/assets/8086413d-85e0-4ddd-beab-88d1a22edd34)](https://aang-air-control-system.web.app)
