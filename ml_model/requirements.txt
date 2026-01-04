@@ -1,0 +1,6 @@
+# Requirements untuk ML API Server (AdaBoost + Scaler)
+numpy>=2.0.0
+scikit-learn==1.6.1
+flask==3.0.0
+flask-cors==4.0.0
+gunicorn==21.2.0

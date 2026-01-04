@@ -1,0 +1,16 @@
+# Ignore files for Cloud Run deployment
+.git
+.gitignore
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+venv
+.env
+*.md
+train_model.py
+air_quality_with_labels.csv
+lightgbm_air_quality_classifier.pkl
+adaboost_air_quality_classifier.pkl
