@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aang AI - Dashboard Kualitas Udara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .animate-fan {
+            animation: spin-slow 1.5s linear infinite;
+        }
+
+        .transition-all-custom {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="text-slate-900 selection:bg-indigo-100 pb-12">
+
+    <header class="glass-header border-b border-slate-200/60 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="bg-gradient-to-tr from-indigo-600 to-indigo-400 p-2.5 rounded-2xl shadow-lg shadow-indigo-100">
+                    <i class="fas fa-th-large text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-black tracking-tight text-slate-800 uppercase leading-none mb-1">Aang</h1>
+                    <div class="flex items-center gap-2">
+                        <span id="system-dot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Sistem Aktif</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="hidden sm:flex flex-col text-right mr-4">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Status Ruangan</p>
+                    <p id="room-status-text" class="text-sm font-bold text-emerald-500">Kondisi Baik</p>
+                </div>
+                <button onclick="location.reload()" class="p-3 bg-slate-100 rounded-xl text-slate-500 hover:bg-slate-200 transition-colors">
+                    <i class="fas fa-sync-alt text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-6 lg:p-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            
+            <div class="bg-white rounded-[32px] p-8 card-shadow border border-slate-100 hover:shadow-xl hover:shadow-indigo-50/50 transition-all-custom">
+                <div class="flex justify-between items-start mb-6">
+                    <div id="pm-icon-bg" class="p-4 rounded-2xl bg-emerald-50 text-emerald-500 transition-all-custom">
+                        <i id="pm-icon" class="fas fa-wind text-xl"></i>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Partikel</span>
+                        <span class="text-[10px] font-bold text-slate-300 uppercase">PM2.5 Sensor</span>
+                    </div>
+                </div>
+                <div class="flex items-baseline gap-1">
+                    <h3 id="pm-value" class="text-5xl font-black tracking-tighter text-slate-800">15</h3>
+                    <span class="text-xl text-slate-300 font-bold">µg/m³</span>
+                </div>
+                <div class="mt-6">
+                    <div class="h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
+                        <div id="pm-progress" class="h-full bg-emerald-500 transition-all duration-1000" style="width: 30%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[32px] p-8 card-shadow border border-slate-100 hover:shadow-xl hover:shadow-amber-50/50 transition-all-custom">
+                <div class="flex justify-between items-start mb-6">
+                    <div id="gas-icon-bg" class="p-4 rounded-2xl bg-blue-50 text-blue-500 transition-all-custom">
+                        <i class="fas fa-bolt text-xl"></i>
+                    </div>
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Kadar Gas</span>
+                </div>
+                <div class="flex items-baseline gap-1">
+                    <h3 id="gas-value" class="text-5xl font-black tracking-tighter text-slate-800">0.50</h3>
+                    <span class="text-xl text-slate-300 font-bold">ppm</span>
+                </div>
+                <p class="mt-6 text-slate-400 text-[10px] font-black uppercase tracking-widest">VOC Detection</p>
+            </div>
+
+            <div class="bg-white rounded-[32px] p-8 card-shadow border border-slate-100 hover:shadow-xl transition-all-custom">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="p-4 bg-orange-50 rounded-2xl text-orange-500">
+                        <i class="fas fa-thermometer-half text-xl"></i>
+                    </div>
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Suhu</span>
+                </div>
+                <div class="flex items-baseline gap-1">
+                    <h3 class="text-5xl font-black tracking-tighter text-slate-800">24.5</h3>
+                    <span class="text-xl text-slate-300 font-bold">°C</span>
+                </div>
+                <div class="mt-6 flex items-center gap-2 text-emerald-500">
+                    <i class="fas fa-check-shield text-xs"></i>
+                    <span class="text-[10px] font-black uppercase tracking-wider text-nowrap">Temperatur Ideal</span>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 rounded-[32px] p-8 shadow-2xl shadow-slate-300 relative overflow-hidden">
+                <div class="absolute top-[-10%] right-[-10%] opacity-10">
+                    <i class="fas fa-clock text-[128px] text-white -rotate-12"></i>
+                </div>
+                <div class="relative z-10 flex flex-col h-full justify-between">
+                    <div class="flex justify-between items-start">
+                        <div class="p-3 bg-white/10 backdrop-blur-md rounded-xl text-indigo-400">
+                            <i class="fas fa-wave-square"></i>
+                        </div>
+                        <span class="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Real-Time</span>
+                    </div>
+                    <div class="mt-6">
+                        <h3 id="current-time" class="text-4xl font-mono font-black text-white tracking-tighter leading-none mb-2">00:00</h3>
+                        <p id="current-day" class="text-indigo-400 text-[10px] font-bold uppercase tracking-[0.2em] leading-none mb-1">Hari</p>
+                        <p id="current-date" class="text-slate-500 text-[10px] font-bold uppercase tracking-widest leading-none">Tanggal</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="space-y-6">
+                <div class="flex items-center justify-between px-2">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-microchip text-xs text-indigo-600"></i>
+                        <h4 class="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">Sistem Otomatisasi</h4>
+                    </div>
+                    <div class="px-2 py-1 bg-indigo-50 rounded-lg text-[10px] font-black text-indigo-600 uppercase">AI Aktif</div>
+                </div>
+                
+                <div id="fan-card" class="p-8 rounded-[40px] border bg-white border-slate-100 transition-all-custom flex items-center justify-between">
+                    <div class="flex items-center gap-6">
+                        <div id="fan-icon-bg" class="p-5 rounded-3xl bg-slate-50 text-slate-300 transition-all-custom">
+                            <i id="fan-icon" class="fas fa-fan text-3xl"></i>
+                        </div>
+                        <div>
+                            <p class="font-black text-xl text-slate-800 leading-none mb-2">Kipas Exhaust</p>
+                            <div class="flex items-center gap-2">
+                                <span id="fan-dot" class="w-2 h-2 rounded-full bg-slate-300"></span>
+                                <p id="fan-text" class="text-xs font-bold uppercase tracking-wider text-slate-400">Standby Mode</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="fan-alert" class="hidden">
+                        <i class="fas fa-exclamation-circle text-2xl text-orange-400"></i>
+                    </div>
+                </div>
+
+                <div id="ionizer-card" class="p-8 rounded-[40px] border bg-white border-slate-100 transition-all-custom flex items-center justify-between">
+                    <div class="flex items-center gap-6">
+                        <div id="ionizer-icon-bg" class="p-5 rounded-3xl bg-slate-50 text-slate-300 transition-all-custom">
+                            <i id="ionizer-icon" class="fas fa-magic text-3xl"></i>
+                        </div>
+                        <div>
+                            <p class="font-black text-xl text-slate-800 leading-none mb-2">Ionizer Pro</p>
+                            <div class="flex items-center gap-2">
+                                <span id="ionizer-dot" class="w-2 h-2 rounded-full bg-slate-300"></span>
+                                <p id="ionizer-text" class="text-xs font-bold uppercase tracking-wider text-slate-400">Standby Mode</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="flex items-center gap-2 px-2">
+                    <i class="fas fa-robot text-xs text-slate-400"></i>
+                    <h4 class="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">Kontrol Manual</h4>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+
+                    <a href="http://192.168.18.133/" target="_blank" class="bg-indigo-600 p-6 rounded-[32px] border border-indigo-500 shadow-lg shadow-indigo-100 flex items-center justify-between hover:bg-indigo-700 transition-all group">
+                        <div class="flex items-center gap-5">
+                            <div class="p-4 rounded-2xl bg-white/20 text-white transition-all group-hover:scale-110">
+                                <i class="fas fa-external-link-alt text-2xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-black text-lg text-white leading-none mb-1">Console Utama</p>
+                                <p class="text-[10px] font-bold text-indigo-200 uppercase tracking-widest">Buka Web Controller</p>
+                            </div>
+                        </div>
+                        <div class="text-white/50 group-hover:text-white transition-colors mr-2">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+
+                    <div class="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm flex items-center justify-between hover:border-blue-200 transition-all group">
+                        <div class="flex items-center gap-5">
+                            <div id="ac-icon-container" class="p-4 rounded-2xl bg-blue-50 text-blue-600 transition-all group-hover:scale-110">
+                                <i class="fas fa-snowflake text-2xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-black text-lg text-slate-800 leading-none mb-1">Smart Air Cond</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kontrol Iklim</p>
+                            </div>
+                        </div>
+                        <button onclick="toggleAC()" id="ac-toggle" class="w-16 h-9 rounded-full relative transition-all duration-300 shadow-inner bg-blue-600">
+                            <div class="absolute top-1.5 left-8 w-6 h-6 bg-white rounded-full transition-all duration-300 shadow-md" id="ac-thumb"></div>
+                        </button>
+                    </div>
+
+                    <div class="bg-indigo-600/5 border border-indigo-100 p-6 rounded-[32px] flex items-start gap-4">
+                        <i class="fas fa-info-circle text-indigo-600 mt-1 shrink-0"></i>
+                        <div>
+                            <p class="text-xs font-bold text-indigo-900 mb-1 tracking-tight">Optimasi Energi AI</p>
+                            <p class="text-[10px] text-indigo-600/80 leading-relaxed font-medium">
+                                Sistem secara otomatis menyesuaikan daya hisap kipas berdasarkan volume PM2.5 di udara untuk menghemat konsumsi energi hingga 30%.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-xl border border-slate-200 px-6 py-3 rounded-full shadow-2xl flex items-center gap-8 lg:hidden z-50">
+         <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+            <span class="text-[10px] font-black uppercase text-slate-500">Node-01</span>
+         </div>
+         <div class="w-px h-4 bg-slate-200"></div>
+         <div class="flex items-center gap-2">
+            <i class="fas fa-wave-square text-indigo-600 text-xs"></i>
+            <span class="text-[10px] font-black uppercase text-slate-500">Syncing...</span>
+         </div>
+    </div>
+
+    <script>
+        // State Management
+        let state = {
+            airQuality: 15,
+            gasLevel: 0.50,
+            isRobotOn: true,
+            isACOn: true
+        };
+
+        // Update Time
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            const dayStr = now.toLocaleDateString('id-ID', { weekday: 'long' });
+            const dateStr = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+            document.getElementById('current-time').textContent = timeStr;
+            document.getElementById('current-day').textContent = dayStr;
+            document.getElementById('current-date').textContent = dateStr;
+        }
+
+        // Logic Otomatisasi
+        function updateAutomation() {
+            const isFanActive = state.airQuality >= 20 || state.gasLevel >= 1.0;
+            const isIonizerActive = state.airQuality >= 30 || state.gasLevel >= 1.5;
+
+            // Update Fan UI
+            const fanCard = document.getElementById('fan-card');
+            const fanIconBg = document.getElementById('fan-icon-bg');
+            const fanIcon = document.getElementById('fan-icon');
+            const fanDot = document.getElementById('fan-dot');
+            const fanText = document.getElementById('fan-text');
+            const fanAlert = document.getElementById('fan-alert');
+            const systemDot = document.getElementById('system-dot');
+            const roomStatusText = document.getElementById('room-status-text');
+
+            if (isFanActive) {
+                fanCard.classList.add('border-orange-200', 'shadow-xl', 'shadow-orange-100/50', 'scale-[1.02]');
+                fanIconBg.classList.replace('bg-slate-50', 'bg-orange-500');
+                fanIconBg.classList.replace('text-slate-300', 'text-white');
+                fanIcon.classList.add('animate-fan');
+                fanDot.classList.replace('bg-slate-300', 'bg-orange-500');
+                fanDot.classList.add('animate-pulse');
+                fanText.textContent = 'Berputar: Menarik Polutan';
+                fanText.classList.replace('text-slate-400', 'text-orange-500');
+                fanAlert.classList.remove('hidden');
+                systemDot.classList.replace('bg-emerald-500', 'bg-orange-500');
+                systemDot.classList.add('animate-pulse');
+                roomStatusText.textContent = 'Perlu Filtrasi';
+                roomStatusText.classList.replace('text-emerald-500', 'text-orange-500');
+            } else {
+                fanCard.classList.remove('border-orange-200', 'shadow-xl', 'shadow-orange-100/50', 'scale-[1.02]');
+                fanIconBg.classList.replace('bg-orange-500', 'bg-slate-50');
+                fanIconBg.classList.replace('text-white', 'text-slate-300');
+                fanIcon.classList.remove('animate-fan');
+                fanDot.classList.replace('bg-orange-500', 'bg-slate-300');
+                fanDot.classList.remove('animate-pulse');
+                fanText.textContent = 'Standby Mode';
+                fanText.classList.replace('text-orange-500', 'text-slate-400');
+                fanAlert.classList.add('hidden');
+                systemDot.classList.replace('bg-orange-500', 'bg-emerald-500');
+                systemDot.classList.remove('animate-pulse');
+                roomStatusText.textContent = 'Kondisi Baik';
+                roomStatusText.classList.replace('text-orange-500', 'text-emerald-500');
+            }
+
+            // Update Ionizer UI
+            const ionizerCard = document.getElementById('ionizer-card');
+            const ionizerIconBg = document.getElementById('ionizer-icon-bg');
+            const ionizerIcon = document.getElementById('ionizer-icon');
+            const ionizerDot = document.getElementById('ionizer-dot');
+            const ionizerText = document.getElementById('ionizer-text');
+
+            if (isIonizerActive) {
+                ionizerCard.classList.add('border-indigo-200', 'shadow-xl', 'shadow-indigo-100/50', 'scale-[1.02]');
+                ionizerIconBg.classList.replace('bg-slate-50', 'bg-indigo-600');
+                ionizerIconBg.classList.replace('text-slate-300', 'text-white');
+                ionizerIcon.classList.add('animate-pulse');
+                ionizerDot.classList.replace('bg-slate-300', 'bg-indigo-600');
+                ionizerDot.classList.add('animate-pulse');
+                ionizerText.textContent = 'Proses Sterilisasi';
+                ionizerText.classList.replace('text-slate-400', 'text-indigo-600');
+            } else {
+                ionizerCard.classList.remove('border-indigo-200', 'shadow-xl', 'shadow-indigo-100/50', 'scale-[1.02]');
+                ionizerIconBg.classList.replace('bg-indigo-600', 'bg-slate-50');
+                ionizerIconBg.classList.replace('text-white', 'text-slate-300');
+                ionizerIcon.classList.remove('animate-pulse');
+                ionizerDot.classList.replace('bg-indigo-600', 'bg-slate-300');
+                ionizerDot.classList.remove('animate-pulse');
+                ionizerText.textContent = 'Standby Mode';
+                ionizerText.classList.replace('text-indigo-600', 'text-slate-400');
+            }
+        }
+
+        // Simulasikan Sensor
+        function updateSensors() {
+            state.airQuality = Math.floor(Math.random() * (45 - 10 + 1)) + 10;
+            state.gasLevel = parseFloat((Math.random() * (2.0 - 0.1) + 0.1).toFixed(2));
+
+            const pmValue = document.getElementById('pm-value');
+            const pmIconBg = document.getElementById('pm-icon-bg');
+            const pmIcon = document.getElementById('pm-icon');
+            const pmProgress = document.getElementById('pm-progress');
+
+            pmValue.textContent = state.airQuality;
+            pmProgress.style.width = Math.min((state.airQuality / 50) * 100, 100) + '%';
+
+            if (state.airQuality >= 30) {
+                pmValue.classList.replace('text-slate-800', 'text-red-600');
+                pmIconBg.classList.replace('bg-emerald-50', 'bg-red-50');
+                pmIconBg.classList.replace('text-emerald-500', 'text-red-500');
+                pmIconBg.classList.add('scale-110', 'shadow-lg', 'shadow-red-100');
+                pmProgress.classList.replace('bg-emerald-500', 'bg-red-500');
+            } else {
+                pmValue.classList.replace('text-red-600', 'text-slate-800');
+                pmIconBg.classList.replace('bg-red-50', 'bg-emerald-50');
+                pmIconBg.classList.replace('text-red-500', 'text-emerald-500');
+                pmIconBg.classList.remove('scale-110', 'shadow-lg', 'shadow-red-100');
+                pmProgress.classList.replace('bg-red-500', 'bg-emerald-500');
+            }
+
+            const gasValue = document.getElementById('gas-value');
+            const gasIconBg = document.getElementById('gas-icon-bg');
+            gasValue.textContent = state.gasLevel.toFixed(2);
+            
+            if (state.gasLevel >= 1.2) {
+                gasValue.classList.replace('text-slate-800', 'text-amber-600');
+                gasIconBg.classList.replace('bg-blue-50', 'bg-amber-100');
+                gasIconBg.classList.replace('text-blue-500', 'text-amber-600');
+                gasIconBg.classList.add('shadow-lg', 'shadow-amber-100');
+            } else {
+                gasValue.classList.replace('text-amber-600', 'text-slate-800');
+                gasIconBg.classList.replace('bg-amber-100', 'bg-blue-50');
+                gasIconBg.classList.replace('text-amber-600', 'text-blue-500');
+                gasIconBg.classList.remove('shadow-lg', 'shadow-amber-100');
+            }
+
+            updateAutomation();
+        }
+
+        function toggleAC() {
+            state.isACOn = !state.isACOn;
+            const btn = document.getElementById('ac-toggle');
+            const thumb = document.getElementById('ac-thumb');
+            const iconContainer = document.getElementById('ac-icon-container');
+
+            if (state.isACOn) {
+                btn.classList.replace('bg-slate-200', 'bg-blue-600');
+                thumb.classList.replace('left-2', 'left-8');
+                iconContainer.classList.replace('bg-slate-50', 'bg-blue-50');
+                iconContainer.classList.replace('text-slate-300', 'text-blue-600');
+            } else {
+                btn.classList.replace('bg-blue-600', 'bg-slate-200');
+                thumb.classList.replace('left-8', 'left-2');
+                iconContainer.classList.replace('bg-blue-50', 'bg-slate-50');
+                iconContainer.classList.replace('text-blue-600', 'text-slate-300');
+            }
+        }
+
+        // Init
+        updateClock();
+        setInterval(updateClock, 1000);
+        setInterval(updateSensors, 4000);
+        updateAutomation();
+    </script>
+</body>
+</html>
